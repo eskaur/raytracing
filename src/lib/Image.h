@@ -11,8 +11,8 @@ namespace Raytracing
     {
     public:
         Image(size_t height, size_t width);
-        Vec3 &operator()(size_t i, size_t j);
-        Vec3 operator()(size_t i, size_t j) const;
+        Color3 &operator()(size_t i, size_t j);
+        Color3 operator()(size_t i, size_t j) const;
         size_t height() const;
         size_t width() const;
         size_t size() const;
@@ -22,6 +22,6 @@ namespace Raytracing
         const size_t m_height;
         const size_t m_width;
         const size_t m_size;
-        std::vector<Vec3> m_values;
+        std::vector<Color3> m_values;
     };
 } // namespace Raytracing

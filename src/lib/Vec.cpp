@@ -133,4 +133,24 @@ namespace Raytracing
         return stream << v.toString();
     }
 
+    Point3 operator+(const Point3 &p, const Vec3 &v)
+    {
+        return Point3(p.x() + v.x(), p.y() + v.y(), p.z() + v.z());
+    }
+
+    Color3 operator*(float t, const Color3 &c)
+    {
+        return Color3(t * c.x(), t * c.y(), t * c.z());
+    }
+
+    Color3 operator+(const Color3 &u, const Color3 &v)
+    {
+        return Color3(u.x() + v.x(), u.y() + v.y(), u.z() + v.z());
+    }
+
+    Color3 operator-(const Color3 &u, const Color3 &v)
+    {
+        return Color3(u.x() - v.x(), u.y() - v.y(), u.z() - v.z());
+    }
+
 } // namespace Raytracing
