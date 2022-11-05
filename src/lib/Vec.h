@@ -43,4 +43,19 @@ namespace Raytracing
     Vec3 unit_vector(Vec3 v);
     std::ostream &operator<<(std::ostream &stream, const Vec3 &v);
 
+    class Color3 : public Vec3
+    {
+        using Vec3::Vec3;
+    };
+
+    class Point3 : public Vec3
+    {
+        using Vec3::Vec3;
+    };
+
+    Point3 operator+(const Point3 &p, const Vec3 &v);
+    Color3 operator*(float t, const Color3 &c);
+    Color3 operator+(const Color3 &u, const Color3 &v);
+    Color3 operator-(const Color3 &u, const Color3 &v);
+
 } // namespace Raytracing

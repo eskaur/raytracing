@@ -8,15 +8,15 @@ namespace Raytracing
         : m_height(height)
         , m_width(width)
         , m_size(height * width)
-        , m_values(m_size, Vec3())
+        , m_values(m_size, Color3())
     {}
 
-    Vec3 &Image::operator()(size_t i, size_t j)
+    Color3 &Image::operator()(size_t i, size_t j)
     {
         return m_values[m_width * i + j];
     }
 
-    Vec3 Image::operator()(size_t i, size_t j) const
+    Color3 Image::operator()(size_t i, size_t j) const
     {
         return m_values[m_width * i + j];
     }
