@@ -4,16 +4,14 @@
 
 namespace Raytracing
 {
-    void render(Image &image, std::function<float(size_t, size_t, Color)> renderFunc)
+    void render(Image &image, std::function<Vec3(size_t, size_t)> renderFunc)
     {
         for(size_t i = 0; i < image.height(); ++i)
         {
             std::cout << "Rendering line: " << i << std::endl;
             for(size_t j = 0; j < image.width(); ++j)
             {
-                image(i, j, Color::Red) = renderFunc(i, j, Color::Red);
-                image(i, j, Color::Green) = renderFunc(i, j, Color::Green);
-                image(i, j, Color::Blue) = renderFunc(i, j, Color::Blue);
+                image(i, j) = renderFunc(i, j);
             }
         }
         std::cout << "\nDone.\n";
