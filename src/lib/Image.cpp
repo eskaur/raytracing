@@ -4,38 +4,21 @@
 
 namespace Raytracing
 {
-    constexpr size_t nColors = 3;
-
     Image::Image(size_t height, size_t width)
         : m_height(height)
         , m_width(width)
         , m_size(height * width)
-        , m_values(nColors * m_size, 0.0F)
+        , m_values(m_size, Vec3())
     {}
 
-    size_t Image::getIdx(size_t i, size_t j, Color color) const
+    Vec3 &Image::operator()(size_t i, size_t j)
     {
-        const size_t colorOffset = [&color]() {
-            switch(color)
-            {
-                case Color::Red: return 0;
-                case Color::Green: return 1;
-                case Color::Blue: return 2;
-                default: throw std::runtime_error("Unknown color");
-            }
-        }();
-
-        return (m_width * nColors) * i + j * nColors + colorOffset;
+        return m_values[m_width * i + j];
     }
 
-    float &Image::operator()(size_t i, size_t j, Color color)
+    Vec3 Image::operator()(size_t i, size_t j) const
     {
-        return m_values[getIdx(i, j, color)];
-    }
-
-    float Image::operator()(size_t i, size_t j, Color color) const
-    {
-        return m_values[getIdx(i, j, color)];
+        return m_values[m_width * i + j];
     }
 
     size_t Image::height() const
@@ -64,13 +47,14 @@ namespace Raytracing
         {
             for(int j = 0; j < width(); ++j)
             {
-                auto ir = static_cast<int>(255.999 * m_values[getIdx(i, j, Color::Red)]);
-                auto ig = static_cast<int>(255.999 * m_values[getIdx(i, j, Color::Green)]);
-                auto ib = static_cast<int>(255.999 * m_values[getIdx(i, j, Color::Blue)]);
+                const auto &color = m_values[m_width * i + j];
+
+                auto ir = static_cast<int>(255.999 * color.x());
+                auto ig = static_cast<int>(255.999 * color.y());
+                auto ib = static_cast<int>(255.999 * color.z());
                 stream << ir << ' ' << ig << ' ' << ib << '\n';
             }
         }
         stream.close();
     }
-
 } // namespace Raytracing
