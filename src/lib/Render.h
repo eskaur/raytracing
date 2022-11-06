@@ -23,6 +23,4 @@ namespace Raytracing
         Vec3 m_vertical;
         Vec3 m_lowerLeftCorner;
     };
-
-    void render(Image &image, std::function<Color3(size_t, size_t)>);
 } // namespace Raytracing
