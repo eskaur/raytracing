@@ -1,32 +1,34 @@
 #include <Image.h>
+#include <Object.h>
 #include <Ray.h>
 #include <Render.h>
+#include <Scene.h>
 #include <Vec.h>
-
-#include <iostream>
-
-Raytracing::Color3 rayColor(const Raytracing::Ray &r)
-{
-    const Raytracing::Vec3 unit_direction = Raytracing::unit_vector(r.direction());
-    const float t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0F - t) * Raytracing::Color3(1.0F, 0.5F, 0.5F) + t * Raytracing::Color3(0.5F, 0.7F, 1.0F);
-}
 
 int main()
 {
+    using namespace Raytracing;
+
+    // Scene
+    Scene scene;
+    scene.addObject(std::make_unique<Sphere>(Point3(-0.3, 0, -1.5), 0.5));
+    scene.addObject(std::make_unique<Sphere>(Point3(0.3, 0, -1), 0.5));
+    scene.addObject(std::make_unique<Sphere>(Point3(0, -501, -1), 500));
+
     // Image
     const auto aspectRatio = 16.0F / 9.0F;
     const int width = 600;
     const int height = width / aspectRatio;
-    auto image = Raytracing::Image(height, width);
+    auto image = Image(height, width);
 
     // Camera
     const float viewportHeight = 2.0F;
     const float viewportWidth = aspectRatio * viewportHeight;
     const float focalLength = 1.0F;
+    auto renderer = Renderer(viewportHeight, viewportWidth, focalLength);
 
     // Render
-    auto renderer = Raytracing::Renderer(viewportHeight, viewportWidth, focalLength);
-    renderer.render(image, rayColor);
+    auto renderFunc = [&scene](const Ray &ray) { return scene.shootRay(ray); };
+    renderer.render(image, renderFunc);
     image.save("image.ppm");
 }
