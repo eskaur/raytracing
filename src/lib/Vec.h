@@ -58,5 +58,6 @@ namespace Raytracing
     Color3 operator+(const Color3 &u, const Color3 &v);
     Color3 operator-(const Color3 &u, const Color3 &v);
     Vec3 operator-(const Point3 &u, const Point3 &v);
+    Color3 operator/(Color3 c, float t);
 
 } // namespace Raytracing
