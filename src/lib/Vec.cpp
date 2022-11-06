@@ -158,4 +158,9 @@ namespace Raytracing
         return Vec3(u.x() - v.x(), u.y() - v.y(), u.z() - v.z());
     }
 
+    Color3 operator/(Color3 c, float t)
+    {
+        return Color3(c.x() / t, c.y() / t, c.z() / t);
+    }
+
 } // namespace Raytracing

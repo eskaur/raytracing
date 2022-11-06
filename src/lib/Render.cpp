@@ -18,17 +18,24 @@ namespace Raytracing
 
     void Renderer::render(Image &image, std::function<Color3(Ray)> renderFunc)
     {
-        for(size_t i = 0; i < image.height(); ++i)
+        for(int i = 0; i < image.height(); ++i)
         {
             std::cout << "Rendering line: " << i << std::endl;
-            for(size_t j = 0; j < image.width(); ++j)
+            for(int j = 0; j < image.width(); ++j)
             {
-                const auto u = float(j) / (image.width() - 1);
-                const auto v = float(i) / (image.height() - 1);
+                Color3 color(0, 0, 0);
 
-                const Ray ray(m_origin, m_lowerLeftCorner + u * m_horizontal + v * m_vertical - m_origin);
-
-                image(i, j) = renderFunc(ray);
+                for(int su = -1; su <= 1; ++su)
+                {
+                    for(int sv = -1; sv <= 1; ++sv)
+                    {
+                        const auto u = float(j + 0.25F * su) / (image.width() - 1);
+                        const auto v = float(i + 0.25F * sv) / (image.height() - 1);
+                        const Ray ray(m_origin, m_lowerLeftCorner + u * m_horizontal + v * m_vertical - m_origin);
+                        color += renderFunc(ray);
+                    }
+                }
+                image(i, j) = color / 9.0F;
             }
         }
         std::cout << "\nDone.\n";
