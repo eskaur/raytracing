@@ -25,6 +25,8 @@ namespace Raytracing
         for(int i = 0; i < image.height(); ++i)
         {
             std::cout << "Rendering line: " << i << std::endl;
+
+#pragma omp parallel for
             for(int j = 0; j < image.width(); ++j)
             {
                 Color3 color(0, 0, 0);
