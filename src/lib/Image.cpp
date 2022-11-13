@@ -1,5 +1,6 @@
 #include <Image.h>
 
+#include <cmath>
 #include <fstream>
 
 namespace Raytracing
@@ -49,9 +50,10 @@ namespace Raytracing
             {
                 const auto &color = m_values[m_width * i + j];
 
-                auto ir = static_cast<int>(255.999 * color.x());
-                auto ig = static_cast<int>(255.999 * color.y());
-                auto ib = static_cast<int>(255.999 * color.z());
+                // Note: sqrt for gamma-correction
+                auto ir = static_cast<int>(255.999 * std::sqrt(color.x()));
+                auto ig = static_cast<int>(255.999 * std::sqrt(color.y()));
+                auto ib = static_cast<int>(255.999 * std::sqrt(color.z()));
                 stream << ir << ' ' << ig << ' ' << ib << '\n';
             }
         }

@@ -11,14 +11,14 @@ int main()
 
     // Scene
     Scene scene;
-    scene.addObject(std::make_unique<Sphere>(Point3(-0.3, 0, -1.5), 0.5));
-    scene.addObject(std::make_unique<Sphere>(Point3(0.3, 0, -1), 0.5));
-    scene.addObject(std::make_unique<Sphere>(Point3(0, -501, -1), 500));
+    scene.addObject(std::make_unique<Sphere>(Point3(0.1, 0, -1), 0.5));
+    scene.addObject(std::make_unique<Sphere>(Point3(-1, -0.25, -1.5), 0.25));
+    scene.addObject(std::make_unique<Sphere>(Point3(0, -50.5, -1), 50));
 
     // Image
     const auto aspectRatio = 16.0F / 9.0F;
-    const int width = 600;
-    const int height = width / aspectRatio;
+    const int height = 200;
+    const int width = height * aspectRatio;
     auto image = Image(height, width);
 
     // Camera
@@ -28,7 +28,6 @@ int main()
     auto renderer = Renderer(viewportHeight, viewportWidth, focalLength);
 
     // Render
-    auto renderFunc = [&scene](const Ray &ray) { return scene.shootRay(ray); };
-    renderer.render(image, renderFunc);
+    renderer.render(image, scene);
     image.save("image.ppm");
 }

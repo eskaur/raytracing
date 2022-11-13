@@ -2,9 +2,8 @@
 
 #include <Image.h>
 #include <Ray.h>
+#include <Scene.h>
 #include <Vec.h>
-
-#include <functional>
 
 namespace Raytracing
 {
@@ -12,7 +11,7 @@ namespace Raytracing
     {
     public:
         Renderer(float viewportHeight, float viewportWidth, float focalLength);
-        void render(Image &image, std::function<Color3(Ray)> renderFunc);
+        void render(Image &image, const Scene &scene);
 
     private:
         float m_viewportHeight;

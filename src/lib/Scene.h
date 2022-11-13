@@ -13,7 +13,7 @@ namespace Raytracing
     {
     public:
         void addObject(std::unique_ptr<Object> object);
-        Color3 shootRay(const Ray &ray);
+        Color3 shootRay(const Ray &ray, int depth) const;
 
     private:
         std::vector<std::unique_ptr<Object>> m_objects;
