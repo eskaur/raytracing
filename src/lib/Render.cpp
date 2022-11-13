@@ -1,6 +1,7 @@
 #include <Render.h>
 
 #include <Ray.h>
+#include <Utils.h>
 
 #include <iostream>
 
@@ -16,8 +17,11 @@ namespace Raytracing
         , m_lowerLeftCorner(m_origin - m_horizontal / 2 - m_vertical / 2 - Raytracing::Vec3(0, 0, m_focalLength))
     {}
 
-    void Renderer::render(Image &image, std::function<Color3(Ray)> renderFunc)
+    void Renderer::render(Image &image, const Scene &scene)
     {
+        constexpr int maxDepth = 20;
+        constexpr int samplesPerPixel = 64;
+
         for(int i = 0; i < image.height(); ++i)
         {
             std::cout << "Rendering line: " << i << std::endl;
@@ -25,17 +29,15 @@ namespace Raytracing
             {
                 Color3 color(0, 0, 0);
 
-                for(int su = -1; su <= 1; ++su)
+                for(int s = 0; s < samplesPerPixel; ++s)
                 {
-                    for(int sv = -1; sv <= 1; ++sv)
-                    {
-                        const auto u = float(j + 0.25F * su) / (image.width() - 1);
-                        const auto v = float(i + 0.25F * sv) / (image.height() - 1);
-                        const Ray ray(m_origin, m_lowerLeftCorner + u * m_horizontal + v * m_vertical - m_origin);
-                        color += renderFunc(ray);
-                    }
+                    const auto u = float(j + random()) / (image.width() - 1);
+                    const auto v = float(i + random()) / (image.height() - 1);
+                    const Ray ray(m_origin, m_lowerLeftCorner + u * m_horizontal + v * m_vertical - m_origin);
+                    color += scene.shootRay(ray, maxDepth);
                 }
-                image(i, j) = color / 9.0F;
+
+                image(i, j) = color / samplesPerPixel;
             }
         }
         std::cout << "\nDone.\n";
