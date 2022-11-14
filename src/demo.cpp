@@ -1,4 +1,5 @@
 #include <Image.h>
+#include <Material.h>
 #include <Object.h>
 #include <Ray.h>
 #include <Render.h>
@@ -11,9 +12,14 @@ int main()
 
     // Scene
     Scene scene;
-    scene.addObject(std::make_unique<Sphere>(Point3(0.1, 0, -1), 0.5));
-    scene.addObject(std::make_unique<Sphere>(Point3(-1, -0.25, -1.5), 0.25));
-    scene.addObject(std::make_unique<Sphere>(Point3(0, -50.5, -1), 50));
+    scene.addObject(
+        std::make_unique<Sphere>(Point3(0.1, -0.1, -1), 0.4, std::make_unique<Lambertian>(Color3(0.5, 0.0, 0.0))));
+    scene.addObject(std::make_unique<Sphere>(
+        Point3(-0.65, -0.25, -1.1), 0.25, std::make_unique<Lambertian>(Color3(0.0, 0.5, 0.0))));
+    scene.addObject(
+        std::make_unique<Sphere>(Point3(0, -100.5, -1), 100, std::make_unique<Lambertian>(Color3(0.2, 0.2, 0.2))));
+    scene.addObject(
+        std::make_unique<Sphere>(Point3(-100, 0, -1), 99, std::make_unique<Lambertian>(Color3(0.2, 0.2, 0.2))));
 
     // Image
     const auto aspectRatio = 16.0F / 9.0F;
