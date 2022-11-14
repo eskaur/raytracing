@@ -6,8 +6,8 @@ namespace Raytracing
 {
     inline double random()
     {
-        static std::uniform_real_distribution<float> distribution(0.0F, 1.0F);
-        static std::mt19937 generator;
+        static thread_local std::uniform_real_distribution<float> distribution(0.0F, 1.0F);
+        static thread_local std::mt19937 generator;
         return distribution(generator);
     }
 
