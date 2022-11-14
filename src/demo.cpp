@@ -17,7 +17,7 @@ int main()
 
     // Image
     const auto aspectRatio = 16.0F / 9.0F;
-    const int height = 200;
+    const int height = 600;
     const int width = height * aspectRatio;
     auto image = Image(height, width);
 
