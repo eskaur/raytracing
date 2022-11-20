@@ -4,9 +4,10 @@
 
 namespace Raytracing
 {
-    Sphere::Sphere(const Point3 &center, float radius)
+    Sphere::Sphere(const Point3 &center, float radius, std::unique_ptr<Material> material)
         : m_center(center)
         , m_radius(radius)
+        , m_material(std::move(material))
     {}
 
     std::optional<HitResult> Sphere::hit(const Ray &ray, float tMin, float tMax) const
@@ -37,7 +38,7 @@ namespace Raytracing
         // Valid hit found
         const auto hitPoint = ray.at(root);
         const auto outwardNormal = (hitPoint - m_center) / m_radius;
-        return HitResult(ray, hitPoint, outwardNormal, root);
+        return HitResult(ray, hitPoint, outwardNormal, root, m_material.get());
     }
 
 } // namespace Raytracing

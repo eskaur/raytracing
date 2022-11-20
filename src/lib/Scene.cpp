@@ -6,27 +6,6 @@
 
 namespace Raytracing
 {
-    namespace
-    {
-        Point3 randomPoint(float min, float max)
-        {
-            return Point3(random(min, max), random(min, max), random(min, max));
-        }
-
-        Point3 random_point_in_unit_sphere()
-        {
-            while(true)
-            {
-                const auto p = randomPoint(-1, 1);
-                if(p.length_squared() >= 1)
-                {
-                    continue;
-                }
-                return p;
-            }
-        }
-    } // namespace
-
     void Scene::addObject(std::unique_ptr<Object> object)
     {
         m_objects.push_back(std::move(object));
@@ -57,9 +36,13 @@ namespace Raytracing
 
         if(closestHit.has_value())
         {
-            const Point3 target = closestHit->point + closestHit->normal + random_point_in_unit_sphere();
-            const auto ray = Ray(closestHit->point, target - closestHit->point);
-            return 0.5 * shootRay(ray, depth - 1);
+            if(const auto scatterResult = closestHit->material->scatter(ray, closestHit->point, closestHit->normal))
+            {
+                // Scatter
+                return scatterResult->attenuation * shootRay(scatterResult->scatteredRay, depth - 1);
+            }
+            // Absorption
+            return Color3(0, 0, 0);
         }
 
         // No hit. Draw background

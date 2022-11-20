@@ -17,4 +17,22 @@ namespace Raytracing
         return min + (max - min) * random();
     }
 
+    inline Point3 randomPoint(float min, float max)
+    {
+        return Point3(random(min, max), random(min, max), random(min, max));
+    }
+
+    inline Point3 random_point_in_unit_sphere()
+    {
+        while(true)
+        {
+            const auto p = randomPoint(-1, 1);
+            if(p.length_squared() >= 1)
+            {
+                continue;
+            }
+            return p;
+        }
+    }
+
 } // namespace Raytracing

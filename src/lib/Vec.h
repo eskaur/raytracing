@@ -75,6 +75,12 @@ namespace Raytracing
             return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
         }
 
+        bool near_zero() const
+        {
+            const float s = 1e-6;
+            return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+        }
+
         std::string toString() const
         {
             std::stringstream stream;
@@ -163,6 +169,11 @@ namespace Raytracing
     inline Color3 operator+(const Color3 &u, const Color3 &v)
     {
         return Color3(u.x() + v.x(), u.y() + v.y(), u.z() + v.z());
+    }
+
+    inline Color3 operator*(const Color3 &u, const Color3 &v)
+    {
+        return Color3(u.x() * v.x(), u.y() * v.y(), u.z() * v.z());
     }
 
     inline Color3 operator-(const Color3 &u, const Color3 &v)
