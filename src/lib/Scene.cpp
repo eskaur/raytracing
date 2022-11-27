@@ -6,9 +6,15 @@
 
 namespace Raytracing
 {
+    Scene::Scene()
+        : m_rootObjectGroup{}
+        , m_tMin(0.001F)
+        , m_tMax(std::numeric_limits<float>::infinity())
+    {}
+
     void Scene::addObject(std::unique_ptr<Object> object)
     {
-        m_objects.push_back(std::move(object));
+        m_rootObjectGroup.addObject(std::move(object));
     }
 
     Color3 Scene::shootRay(const Ray &ray, int depth) const
@@ -18,21 +24,7 @@ namespace Raytracing
             return Color3(0.0F, 0.0F, 0.0F);
         }
 
-        const float tMin = 0.001F;
-        const float tMax = std::numeric_limits<float>::infinity();
-
-        std::optional<HitResult> closestHit;
-        float tClosest = tMax;
-
-        for(const auto &object : m_objects)
-        {
-            if(const auto hit = object->hit(ray, tMin, tClosest))
-            {
-                // Found a hit closer than the closest so far
-                tClosest = hit->t;
-                closestHit = hit;
-            }
-        }
+        const auto closestHit = m_rootObjectGroup.hit(ray, m_tMin, m_tMax);
 
         if(closestHit.has_value())
         {
