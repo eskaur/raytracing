@@ -6,8 +6,9 @@ namespace Raytracing
 {
     inline float random()
     {
+        static thread_local std::random_device rd;
         static thread_local std::uniform_real_distribution<float> distribution(0.0F, 1.0F);
-        static thread_local std::mt19937 generator;
+        static thread_local std::mt19937 generator(rd());
         return distribution(generator);
     }
 
