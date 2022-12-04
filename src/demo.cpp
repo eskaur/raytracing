@@ -1,8 +1,6 @@
-#include <Image.h>
+#include <Camera.h>
 #include <Material.h>
 #include <Object.h>
-#include <Ray.h>
-#include <Render.h>
 #include <Scene.h>
 #include <Vec.h>
 
@@ -51,19 +49,14 @@ int main()
     scene.addObject(std::make_unique<Box>(
         Point3(-0.8, -0.45, -1.0), Vec3(0.10, 0.10, 0.10), std::make_unique<Lambertian>(Color3(0.7, 0.0, 0.0))));
 
-    // Image
-    const auto aspectRatio = 16.0F / 9.0F;
-    const int height = 600;
-    const int width = height * aspectRatio;
-    auto image = Image(height, width);
-
     // Camera
+    const auto aspectRatio = 16.0F / 9.0F;
+    const int pixelHeight = 600;
     const float viewportHeight = 2.0F;
-    const float viewportWidth = aspectRatio * viewportHeight;
     const float focalLength = 1.0F;
-    auto renderer = Renderer(viewportHeight, viewportWidth, focalLength);
+    const auto camera = Camera(aspectRatio, pixelHeight, viewportHeight, focalLength);
 
     // Render
-    renderer.render(image, scene);
+    const auto image = camera.render(scene);
     image.save("image.ppm");
 }
