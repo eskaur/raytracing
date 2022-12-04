@@ -47,6 +47,9 @@ int main()
         std::make_unique<XZRect>(Point3(0.0, 0.5, -0.9), 2, 0.3, std::make_unique<Lambertian>(Color3(0.2, 0.2, 0.2))));
     scene.addObject(
         std::make_unique<XZRect>(Point3(0.0, 0.5, -0.4), 2, 0.3, std::make_unique<Lambertian>(Color3(0.2, 0.2, 0.2))));
+    // Box
+    scene.addObject(std::make_unique<Box>(
+        Point3(-0.8, -0.45, -1.0), Vec3(0.10, 0.10, 0.10), std::make_unique<Lambertian>(Color3(0.7, 0.0, 0.0))));
 
     // Image
     const auto aspectRatio = 16.0F / 9.0F;

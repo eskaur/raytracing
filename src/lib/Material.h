@@ -4,6 +4,7 @@
 #include <Utils.h>
 #include <Vec.h>
 
+#include <memory>
 #include <optional>
 
 namespace Raytracing
@@ -19,6 +20,8 @@ namespace Raytracing
     public:
         virtual std::optional<ScatterResult>
         scatter(const Ray &incomingRay, const Point3 &hitPoint, const Vec3 &hitNormal) const = 0;
+
+        virtual std::unique_ptr<Material> clone() const = 0;
     };
 
     class Lambertian : public Material
@@ -36,6 +39,11 @@ namespace Raytracing
                 scatterDirection = hitNormal;
             }
             return ScatterResult{ m_albedo, Ray(hitPoint, scatterDirection) };
+        }
+
+        virtual std::unique_ptr<Material> clone() const
+        {
+            return std::make_unique<Lambertian>(*this);
         }
 
     private:
@@ -74,6 +82,11 @@ namespace Raytracing
                 return std::nullopt;
             }
             return ScatterResult{ m_albedo, scatteredRay };
+        }
+
+        virtual std::unique_ptr<Material> clone() const
+        {
+            return std::make_unique<Metal>(*this);
         }
 
     private:

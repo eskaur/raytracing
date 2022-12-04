@@ -12,11 +12,14 @@ namespace Raytracing
     class Scene
     {
     public:
-        void addObject(std::unique_ptr<Object> object);
+        Scene();
         Color3 shootRay(const Ray &ray, int depth) const;
+        void addObject(std::unique_ptr<Object> object);
 
     private:
-        std::vector<std::unique_ptr<Object>> m_objects;
+        ObjectGroup m_rootObjectGroup;
+        const float m_tMin;
+        const float m_tMax;
     };
 
 } // namespace Raytracing

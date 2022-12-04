@@ -48,14 +48,32 @@ namespace Raytracing
         }
     } // namespace
 
-    Object::Object(std::unique_ptr<Material> material)
-        : m_material(std::move(material))
-    {}
+    std::optional<HitResult> ObjectGroup::hit(const Ray &ray, float tMin, float tMax) const
+    {
+        std::optional<HitResult> closestHit;
+        float tClosest = tMax;
+
+        for(const auto &object : m_objects)
+        {
+            if(const auto hit = object->hit(ray, tMin, tClosest))
+            {
+                // Found a hit closer than the closest so far
+                tClosest = hit->t;
+                closestHit = hit;
+            }
+        }
+        return closestHit;
+    }
+
+    void ObjectGroup::addObject(std::unique_ptr<Object> object)
+    {
+        m_objects.push_back(std::move(object));
+    }
 
     Sphere::Sphere(const Point3 &center, float radius, std::unique_ptr<Material> material)
-        : Object(std::move(material))
-        , m_center(center)
+        : m_center(center)
         , m_radius(radius)
+        , m_material(std::move(material))
     {}
 
     std::optional<HitResult> Sphere::hit(const Ray &ray, float tMin, float tMax) const
@@ -105,6 +123,22 @@ namespace Raytracing
     std::optional<HitResult> YZRect::hit(Raytracing::Ray const &ray, float tMin, float tMax) const
     {
         return rectangleHit(ray, tMin, tMax, 1, 2, 0, m_minA, m_maxA, m_minB, m_maxB, m_posC, m_material);
+    }
+
+    Box::Box(const Point3 &center, Vec3 size, std::unique_ptr<Material> material)
+    {
+        // Front
+        addObject(std::make_unique<XYRect>(center + Vec3(0, 0, size.z() / 2), size.x(), size.y(), material->clone()));
+        // Back
+        addObject(std::make_unique<XYRect>(center - Vec3(0, 0, size.z() / 2), size.x(), size.y(), material->clone()));
+        // Bottom
+        addObject(std::make_unique<XZRect>(center - Vec3(0, size.y() / 2, 0), size.x(), size.z(), material->clone()));
+        // Top
+        addObject(std::make_unique<XZRect>(center + Vec3(0, size.y() / 2, 0), size.x(), size.z(), material->clone()));
+        // Left
+        addObject(std::make_unique<YZRect>(center - Vec3(size.x() / 2, 0, 0), size.y(), size.z(), material->clone()));
+        // Right
+        addObject(std::make_unique<YZRect>(center + Vec3(size.x() / 2, 0, 0), size.y(), size.z(), material->clone()));
     }
 
 } // namespace Raytracing
