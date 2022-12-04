@@ -8,7 +8,7 @@ namespace Raytracing
     class Camera
     {
     public:
-        Camera(float aspectRatio, size_t pixelHeight, float viewportHeight, float focalLength);
+        Camera(float aspectRatio, size_t pixelHeight, float verticalFovDegrees);
         Image render(const Scene &scene) const;
 
     private:
@@ -16,6 +16,5 @@ namespace Raytracing
         const size_t m_pixelWidth;
         const float m_viewportHeight;
         const float m_viewportWidth;
-        const float m_focalLength;
     };
 } // namespace Raytracing

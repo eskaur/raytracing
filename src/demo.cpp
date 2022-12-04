@@ -51,10 +51,10 @@ int main()
 
     // Camera
     const auto aspectRatio = 16.0F / 9.0F;
-    const int pixelHeight = 600;
-    const float viewportHeight = 2.0F;
-    const float focalLength = 1.0F;
-    const auto camera = Camera(aspectRatio, pixelHeight, viewportHeight, focalLength);
+    const int pixelHeight = 300;
+    const float verticalFovDegrees = 80.0F;
+
+    const auto camera = Camera(aspectRatio, pixelHeight, verticalFovDegrees);
 
     // Render
     const auto image = camera.render(scene);
