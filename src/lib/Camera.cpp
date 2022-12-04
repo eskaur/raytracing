@@ -5,6 +5,9 @@
 
 namespace
 {
+    constexpr int maxDepth = 20;
+    constexpr int samplesPerPixel = 64;
+    constexpr float aaBlur = 0.5F;
     constexpr float focalLength = 1.0F;
     constexpr float pi = 3.1415926535897932385;
 
@@ -17,8 +20,15 @@ namespace
 
 namespace Raytracing
 {
-    Camera::Camera(float aspectRatio, size_t pixelHeight, float verticalFovDegrees)
-        : m_pixelHeight(pixelHeight)
+    Camera::Camera(
+        const Point3 &origin,
+        const Point3 &lookAt,
+        float aspectRatio,
+        size_t pixelHeight,
+        float verticalFovDegrees)
+        : m_origin(origin)
+        , m_lookDir(unit_vector(lookAt - origin))
+        , m_pixelHeight(pixelHeight)
         , m_pixelWidth(aspectRatio * pixelHeight)
         , m_viewportHeight(2.0F * focalLength * std::tan(0.5F * deg2rad(verticalFovDegrees)))
         , m_viewportWidth(aspectRatio * m_viewportHeight)
@@ -37,13 +47,17 @@ namespace Raytracing
     {
         Image image(m_pixelHeight, m_pixelWidth);
 
-        const auto origin = Point3(0.0F, 0.0F, 0.0F);
-        const auto horizontal = Vec3(m_viewportWidth, 0.0F, 0.0F);
-        const auto vertical = Vec3(0, m_viewportHeight, 0);
-        const auto lowerLeftCorner(origin - horizontal / 2 - vertical / 2 - Vec3(0, 0, focalLength));
+        const Vec3 up(0, 1, 0);
 
-        constexpr int maxDepth = 20;
-        constexpr int samplesPerPixel = 64;
+        const Vec3 w = unit_vector(-m_lookDir);
+        const Vec3 u = unit_vector(cross(up, w));
+        const Vec3 v = unit_vector(cross(w, u));
+
+        const Point3 viewportCenter = m_origin - focalLength * w;
+        const Point3 viewportLowerLeftCorner = viewportCenter - 0.5 * (u * m_viewportWidth + v * m_viewportHeight);
+
+        const float duPixel = m_viewportWidth / (image.width() - 1);
+        const float dvPixel = m_viewportHeight / (image.height() - 1);
 
 #pragma omp parallel for schedule(dynamic)
         for(int i = 0; i < image.height(); ++i)
@@ -56,9 +70,12 @@ namespace Raytracing
 
                 for(int s = 0; s < samplesPerPixel; ++s)
                 {
-                    const auto u = float(j + random()) / (image.width() - 1);
-                    const auto v = float(i + random()) / (image.height() - 1);
-                    const Ray ray(origin, lowerLeftCorner + u * horizontal + v * vertical - origin);
+                    const float jRandomized = random(j - aaBlur, j + aaBlur);
+                    const float iRandomized = random(i - aaBlur, i + aaBlur);
+                    const float du = jRandomized * duPixel;
+                    const float dv = iRandomized * dvPixel;
+                    const Point3 rayViewportIntersect = viewportLowerLeftCorner + du * u + dv * v;
+                    const Ray ray(m_origin, rayViewportIntersect - m_origin);
                     color += scene.shootRay(ray, maxDepth);
                 }
 
