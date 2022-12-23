@@ -12,9 +12,11 @@ namespace Raytracing
         Camera(
             const Point3 &origin,
             const Point3 &lookAt,
+            float focusDist,
             float aspectRatio,
             size_t pixelHeight,
-            float verticalFovDegrees);
+            float verticalFovDegrees,
+            float lensRadius);
         Image render(const Scene &scene) const;
 
     private:
@@ -22,7 +24,9 @@ namespace Raytracing
         const Vec3 m_lookDir;
         const size_t m_pixelHeight;
         const size_t m_pixelWidth;
-        const float m_viewportHeight;
-        const float m_viewportWidth;
+        const float m_focusDist;
+        const float m_focalPlaneHeight;
+        const float m_focalPlaneWidth;
+        const float m_lensRadius;
     };
 } // namespace Raytracing

@@ -36,4 +36,17 @@ namespace Raytracing
         }
     }
 
+    inline Point3 random_in_unit_disk()
+    {
+        while(true)
+        {
+            auto p = Point3(random(-1.0F, 1.0F), random(-1.0F, 1.0F), 0.0F);
+            if(p.length_squared() >= 1)
+            {
+                continue;
+            }
+            return p;
+        }
+    }
+
 } // namespace Raytracing
