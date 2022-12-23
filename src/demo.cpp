@@ -23,10 +23,22 @@ namespace Raytracing
             Scene scene;
             //Red sphere
             scene.addObject(std::make_unique<Sphere>(Point3(0.1, 0.3, -1.4), 0.3, std::make_unique<Metal>(red, 0.75)));
-            //Green sphere
+            //Green spheres
             scene.addObject(
-                std::make_unique<Sphere>(Point3(-0.65, 0.25, -1.3), 0.25, std::make_unique<Lambertian>(green)));
-            // Blue shiny sphere
+                std::make_unique<Sphere>(Point3(-0.65, 0.15, -1.3), 0.15, std::make_unique<Lambertian>(green)));
+            scene.addObject(
+                std::make_unique<Sphere>(Point3(-0.65, 0.15, -1.7), 0.15, std::make_unique<Lambertian>(green)));
+            scene.addObject(
+                std::make_unique<Sphere>(Point3(-0.65, 0.15, -2.1), 0.15, std::make_unique<Lambertian>(green)));
+            scene.addObject(
+                std::make_unique<Sphere>(Point3(-0.65, 0.15, -2.5), 0.15, std::make_unique<Lambertian>(green)));
+            scene.addObject(
+                std::make_unique<Sphere>(Point3(-0.65, 0.15, -2.9), 0.15, std::make_unique<Lambertian>(green)));
+            scene.addObject(
+                std::make_unique<Sphere>(Point3(-0.65, 0.15, -3.3), 0.15, std::make_unique<Lambertian>(green)));
+            scene.addObject(
+                std::make_unique<Sphere>(Point3(-0.65, 0.15, -3.7), 0.15, std::make_unique<Lambertian>(green)));
+            // Blue sphere
             scene.addObject(std::make_unique<Sphere>(Point3(0.2, 0.1, -0.8), 0.10, std::make_unique<Lambertian>(blue)));
             // Metallic spheres
             scene.addObject(std::make_unique<Sphere>(Point3(-0.3, 0.1, -1.0), 0.1, std::make_unique<Metal>(gold)));
@@ -42,8 +54,12 @@ namespace Raytracing
                 std::make_unique<YZRect>(Point3(1.0, 0.5, 0.0), 1, 1000, std::make_unique<Metal>(gray, 0.2)));
             // Back wall
             scene.addObject(
-                std::make_unique<XYRect>(Point3(0.0, 0.5, -2.0), 10, 1, std::make_unique<Lambertian>(gray)));
+                std::make_unique<XYRect>(Point3(0.0, 0.5, -5.0), 10, 1, std::make_unique<Lambertian>(gray)));
             // Ceiling panels
+            scene.addObject(
+                std::make_unique<XZRect>(Point3(0.0, 1.0, -2.9), 2, 0.3, std::make_unique<Lambertian>(gray)));
+            scene.addObject(
+                std::make_unique<XZRect>(Point3(0.0, 1.0, -2.4), 2, 0.3, std::make_unique<Lambertian>(gray)));
             scene.addObject(
                 std::make_unique<XZRect>(Point3(0.0, 1.0, -1.9), 2, 0.3, std::make_unique<Lambertian>(gray)));
             scene.addObject(
@@ -121,10 +137,12 @@ int main()
     const auto aspectRatio = 16.0F / 9.0F;
     const int pixelHeight = 500;
     const float verticalFovDegrees = 70.0F;
-    const auto cameraPos = Point3(0.1, 0.5, 0.0);
-    const auto lookAt = Point3(-0.1, 0.2, -2.0);
+    const auto cameraPos = Point3(-0.2, 0.5, 0.0);
+    const auto lookAt = Point3(0.0, 0.5, -1.0);
+    const float focusDist = 1.0;
+    const float lensRadius = 0.01;
 
-    const auto camera = Camera(cameraPos, lookAt, aspectRatio, pixelHeight, verticalFovDegrees);
+    const auto camera = Camera(cameraPos, lookAt, focusDist, aspectRatio, pixelHeight, verticalFovDegrees, lensRadius);
 
     // Render
     const auto image = camera.render(scene);

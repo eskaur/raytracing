@@ -8,7 +8,6 @@ namespace
     constexpr int maxDepth = 20;
     constexpr int samplesPerPixel = 64;
     constexpr float aaBlur = 0.5F;
-    constexpr float focalLength = 1.0F;
     constexpr float pi = 3.1415926535897932385;
 
     float deg2rad(float deg)
@@ -23,15 +22,19 @@ namespace Raytracing
     Camera::Camera(
         const Point3 &origin,
         const Point3 &lookAt,
+        float focusDist,
         float aspectRatio,
         size_t pixelHeight,
-        float verticalFovDegrees)
+        float verticalFovDegrees,
+        float lensRadius)
         : m_origin(origin)
         , m_lookDir(unit_vector(lookAt - origin))
         , m_pixelHeight(pixelHeight)
         , m_pixelWidth(aspectRatio * pixelHeight)
-        , m_viewportHeight(2.0F * focalLength * std::tan(0.5F * deg2rad(verticalFovDegrees)))
-        , m_viewportWidth(aspectRatio * m_viewportHeight)
+        , m_focusDist(focusDist)
+        , m_focalPlaneHeight(2.0F * focusDist * std::tan(0.5F * deg2rad(verticalFovDegrees)))
+        , m_focalPlaneWidth(aspectRatio * m_focalPlaneHeight)
+        , m_lensRadius(lensRadius)
     {
         if(aspectRatio <= 0.0)
         {
@@ -53,11 +56,13 @@ namespace Raytracing
         const Vec3 u = unit_vector(cross(up, w));
         const Vec3 v = unit_vector(cross(w, u));
 
-        const Point3 viewportCenter = m_origin - focalLength * w;
-        const Point3 viewportLowerLeftCorner = viewportCenter - 0.5 * (u * m_viewportWidth + v * m_viewportHeight);
+        const Point3 focalPlaneCenter = m_origin + m_focusDist * m_lookDir;
 
-        const float duPixel = m_viewportWidth / (image.width() - 1);
-        const float dvPixel = m_viewportHeight / (image.height() - 1);
+        const Point3 focalPlaneLowerLeftCorner =
+            focalPlaneCenter - 0.5F * m_focalPlaneWidth * u - 0.5F * m_focalPlaneHeight * v;
+
+        const float duPixel = m_focalPlaneWidth / (image.width() - 1);
+        const float dvPixel = m_focalPlaneHeight / (image.height() - 1);
 
 #pragma omp parallel for schedule(dynamic)
         for(int i = 0; i < image.height(); ++i)
@@ -70,12 +75,16 @@ namespace Raytracing
 
                 for(int s = 0; s < samplesPerPixel; ++s)
                 {
+                    const Vec3 rd = m_lensRadius * random_in_unit_disk();
+                    const Vec3 offset = u * rd.x() + v * rd.y();
+                    const Point3 newOrigin = m_origin + offset;
+
                     const float jRandomized = random(j - aaBlur, j + aaBlur);
                     const float iRandomized = random(i - aaBlur, i + aaBlur);
                     const float du = jRandomized * duPixel;
                     const float dv = iRandomized * dvPixel;
-                    const Point3 rayViewportIntersect = viewportLowerLeftCorner + du * u + dv * v;
-                    const Ray ray(m_origin, rayViewportIntersect - m_origin);
+                    const Point3 rayFocalPlaneIntersect = focalPlaneLowerLeftCorner + du * u + dv * v;
+                    const Ray ray(newOrigin, rayFocalPlaneIntersect - newOrigin);
                     color += scene.shootRay(ray, maxDepth);
                 }
 
