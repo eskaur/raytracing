@@ -6,8 +6,9 @@
 
 namespace Raytracing
 {
-    Scene::Scene()
-        : m_rootObjectGroup{}
+    Scene::Scene(float skyBrightness)
+        : m_skyBrightness(skyBrightness)
+        , m_rootObjectGroup{}
         , m_tMin(0.001F)
         , m_tMax(std::numeric_limits<float>::infinity())
     {}
@@ -28,19 +29,22 @@ namespace Raytracing
 
         if(closestHit.has_value())
         {
+            const auto emissionResult = closestHit->material->emit();
+
             if(const auto scatterResult = closestHit->material->scatter(ray, closestHit->point, closestHit->normal))
             {
-                // Scatter
-                return scatterResult->attenuation * shootRay(scatterResult->scatteredRay, depth - 1);
+                // Emit and scatter
+                return emissionResult.color
+                       + scatterResult->attenuation * shootRay(scatterResult->scatteredRay, depth - 1);
             }
-            // Absorption
-            return Color3(0, 0, 0);
+            // Pure emission
+            return emissionResult.color;
         }
 
         // No hit. Draw background
         const Vec3 unitDirection = unit_vector(ray.direction());
         const float t1 = 0.5 * (unitDirection.y() + 1.0);
-        return (1.0F - t1) * Color3(1.0F, 1.0F, 1.0F) + t1 * Color3(0.5F, 0.7F, 1.0F);
+        return m_skyBrightness * ((1.0F - t1) * Color3(1.0F, 1.0F, 1.0F) + t1 * Color3(0.5F, 0.7F, 1.0F));
     }
 
 } // namespace Raytracing

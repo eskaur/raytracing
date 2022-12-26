@@ -14,13 +14,14 @@ namespace Raytracing
         const auto green = Color3(0.0, 0.5, 0.0);
         const auto blue = Color3(0.1, 0.1, 0.9);
         const auto gold = Color3(1, 0.7, 0.1);
+        const auto orange = Color3(1, 0.4, 0.1);
         const auto blueGray = Color3(0.2, 0.2, 0.5);
         const auto gray = Color3(0.4, 0.4, 0.4);
         const auto white = Color3(0.9, 0.9, 0.9);
 
         Scene manualScene()
         {
-            Scene scene;
+            Scene scene(1.0);
             //Red sphere
             scene.addObject(std::make_unique<Sphere>(Point3(0.1, 0.3, -1.4), 0.3, std::make_unique<Metal>(red, 0.75)));
             //Green spheres
@@ -77,7 +78,7 @@ namespace Raytracing
 
         Scene randomizedScene()
         {
-            Scene scene;
+            Scene scene(1.0);
 
             // Floor
             const float floorLevel = -0.75F;
@@ -122,6 +123,37 @@ namespace Raytracing
             return scene;
         }
 
+        Scene cornellBox()
+        {
+            Scene scene(0.0);
+
+            // Front wall
+            scene.addObject(std::make_unique<XYRect>(Point3(0, 0, -10), 10, 10, std::make_unique<Lambertian>(gray)));
+            // Right wall
+            scene.addObject(std::make_unique<YZRect>(Point3(5, 0, -5), 10, 10, std::make_unique<Lambertian>(red)));
+            // Left wall
+            scene.addObject(std::make_unique<YZRect>(Point3(-5, 0, -5), 10, 10, std::make_unique<Lambertian>(green)));
+            // Floor
+            scene.addObject(std::make_unique<XZRect>(Point3(0, -5, -5), 10, 10, std::make_unique<Lambertian>(gray)));
+            // Ceiling
+            scene.addObject(std::make_unique<XZRect>(Point3(0, 5, -5), 10, 10, std::make_unique<Lambertian>(gray)));
+            // Ceiling light
+            scene.addObject(
+                std::make_unique<XZRect>(Point3(0, 4.99, -8), 4, 3, std::make_unique<DiffuseLight>(Color3(5, 5, 5))));
+            // Room contents
+            scene.addObject(
+                std::make_unique<Box>(Point3(-3.5, -4, -8), Vec3(1, 2, 1), std::make_unique<Lambertian>(blue)));
+            scene.addObject(
+                std::make_unique<Box>(Point3(2, -4, -6), Vec3(3, 2, 3), std::make_unique<Lambertian>(gray)));
+            scene.addObject(std::make_unique<Sphere>(Point3(-1, -3.5, -9), 1.5, std::make_unique<Metal>(gold)));
+
+            scene.addObject(std::make_unique<Sphere>(Point3(2, -2.5, -5.5), 0.5, std::make_unique<Lambertian>(orange)));
+            // Wall mirror
+            scene.addObject(std::make_unique<YZRect>(Point3(4.99, -2, -5), 3, 5, std::make_unique<Metal>(white, 0.01)));
+
+            return scene;
+        }
+
     } // namespace
 } // namespace Raytracing
 
@@ -130,17 +162,18 @@ int main()
     using namespace Raytracing;
 
     // Scene
-    const auto scene = manualScene();
+    //const auto scene = manualScene();
     //const auto scene = randomizedScene();
+    const auto scene = cornellBox();
 
     // Camera
     const auto aspectRatio = 16.0F / 9.0F;
-    const int pixelHeight = 500;
-    const float verticalFovDegrees = 70.0F;
-    const auto cameraPos = Point3(-0.2, 0.5, 0.0);
-    const auto lookAt = Point3(0.0, 0.5, -1.0);
-    const float focusDist = 1.0;
-    const float lensRadius = 0.01;
+    const int pixelHeight = 400;
+    const float verticalFovDegrees = 90.0F;
+    const auto cameraPos = Point3(-1.0, 0, -0.1);
+    const auto lookAt = Point3(2.0, 0.0, -10.0);
+    const float focusDist = 7.0;
+    const float lensRadius = 0.1;
 
     const auto camera = Camera(cameraPos, lookAt, focusDist, aspectRatio, pixelHeight, verticalFovDegrees, lensRadius);
 

@@ -15,11 +15,21 @@ namespace Raytracing
         Ray scatteredRay;
     };
 
+    struct EmissionResult
+    {
+        Color3 color;
+    };
+
     class Material
     {
     public:
         virtual std::optional<ScatterResult>
         scatter(const Ray &incomingRay, const Point3 &hitPoint, const Vec3 &hitNormal) const = 0;
+
+        virtual EmissionResult emit() const
+        {
+            return EmissionResult{ Color3(0.0F, 0.0F, 0.0F) };
+        }
 
         virtual std::unique_ptr<Material> clone() const = 0;
     };
@@ -92,6 +102,32 @@ namespace Raytracing
     private:
         Color3 m_albedo;
         float m_roughness;
+    };
+
+    class DiffuseLight : public Material
+    {
+    public:
+        DiffuseLight(const Color3 color)
+            : m_color(color)
+        {}
+
+        virtual std::optional<ScatterResult> scatter(const Ray &, const Point3 &, const Vec3 &) const override
+        {
+            return std::nullopt;
+        }
+
+        virtual EmissionResult emit() const override
+        {
+            return EmissionResult{ m_color };
+        }
+
+        virtual std::unique_ptr<Material> clone() const
+        {
+            return std::make_unique<DiffuseLight>(*this);
+        }
+
+    private:
+        Color3 m_color;
     };
 
 } // namespace Raytracing
