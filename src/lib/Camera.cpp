@@ -5,8 +5,8 @@
 
 namespace
 {
-    constexpr int maxDepth = 20;
-    constexpr int samplesPerPixel = 64;
+    constexpr int maxDepth = 10;
+    constexpr int samplesPerPixel = 128;
     constexpr float aaBlur = 0.5F;
     constexpr float pi = 3.1415926535897932385;
 
