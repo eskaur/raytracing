@@ -5,6 +5,8 @@
 #include <Utils.h>
 #include <Vec.h>
 
+#include <utility>
+
 namespace Raytracing
 {
     namespace
@@ -19,7 +21,7 @@ namespace Raytracing
         const auto gray = Color3(0.4, 0.4, 0.4);
         const auto white = Color3(0.9, 0.9, 0.9);
 
-        Scene manualScene()
+        std::pair<Camera, Scene> manualScene()
         {
             Scene scene(1.0);
             //Red sphere
@@ -73,10 +75,22 @@ namespace Raytracing
             scene.addObject(std::make_unique<Box>(
                 Point3(-0.8, 0.05, -1.0), Vec3(0.10, 0.10, 0.10), std::make_unique<Lambertian>(red)));
 
-            return scene;
+            // Camera
+            const auto aspectRatio = 16.0F / 9.0F;
+            const int pixelHeight = 400;
+            const float verticalFovDegrees = 90.0F;
+            const auto cameraPos = Point3(-0.25, 0.5, 0);
+            const auto lookAt = Point3(0.25, 0, -5);
+            const float focusDist = 1.4;
+            const float lensRadius = 0.025;
+
+            const auto camera =
+                Camera(cameraPos, lookAt, focusDist, aspectRatio, pixelHeight, verticalFovDegrees, lensRadius);
+
+            return std::make_pair(camera, std::move(scene));
         }
 
-        Scene randomizedScene()
+        std::pair<Camera, Scene> randomizedScene()
         {
             Scene scene(1.0);
 
@@ -86,14 +100,15 @@ namespace Raytracing
                 std::make_unique<XZRect>(Point3(0.0, floorLevel, 0.0), 100, 100, std::make_unique<Lambertian>(gray)));
 
             // Many small spheres
-            const int n = 10;
+            const int n = 5;
             for(int a = -n; a < n; a++)
             {
                 for(int b = -n; b < n; b++)
                 {
                     const auto radius = 0.2F;
                     const auto materialChooser = random();
-                    const auto centerPos = Point3(a + 0.8 * random(), floorLevel + radius, b + 0.8 * double());
+                    const auto centerPos =
+                        Point3(1.5 * a + 0.8 * random(), floorLevel + radius, 1.5 * b + 0.8 * random());
                     std::unique_ptr<Material> material;
                     if(materialChooser < 0.8)
                     {
@@ -120,10 +135,22 @@ namespace Raytracing
             scene.addObject(std::make_unique<Sphere>(
                 Point3(1.5, floorLevel + largeRadius, -3.0), largeRadius, std::make_unique<Metal>(white, 0.05)));
 
-            return scene;
+            // Camera
+            const auto aspectRatio = 16.0F / 9.0F;
+            const int pixelHeight = 400;
+            const float verticalFovDegrees = 90.0F;
+            const auto cameraPos = Point3(0, 0, 0);
+            const auto lookAt = Point3(0, floorLevel, -4.0);
+            const float focusDist = 4.0;
+            const float lensRadius = 0.05;
+
+            const auto camera =
+                Camera(cameraPos, lookAt, focusDist, aspectRatio, pixelHeight, verticalFovDegrees, lensRadius);
+
+            return std::make_pair(camera, std::move(scene));
         }
 
-        Scene cornellBox()
+        std::pair<Camera, Scene> cornellBox()
         {
             Scene scene(0.0);
 
@@ -151,7 +178,19 @@ namespace Raytracing
             // Wall mirror
             scene.addObject(std::make_unique<YZRect>(Point3(4.99, -2, -5), 3, 5, std::make_unique<Metal>(white, 0.01)));
 
-            return scene;
+            // Camera
+            const auto aspectRatio = 16.0F / 9.0F;
+            const int pixelHeight = 200;
+            const float verticalFovDegrees = 90.0F;
+            const auto cameraPos = Point3(-1.0, 0, -0.1);
+            const auto lookAt = Point3(2.0, 0.0, -10.0);
+            const float focusDist = 7.0;
+            const float lensRadius = 0.1;
+
+            const auto camera =
+                Camera(cameraPos, lookAt, focusDist, aspectRatio, pixelHeight, verticalFovDegrees, lensRadius);
+
+            return std::make_pair(camera, std::move(scene));
         }
 
     } // namespace
@@ -161,21 +200,10 @@ int main()
 {
     using namespace Raytracing;
 
-    // Scene
-    //const auto scene = manualScene();
-    //const auto scene = randomizedScene();
-    const auto scene = cornellBox();
-
-    // Camera
-    const auto aspectRatio = 16.0F / 9.0F;
-    const int pixelHeight = 400;
-    const float verticalFovDegrees = 90.0F;
-    const auto cameraPos = Point3(-1.0, 0, -0.1);
-    const auto lookAt = Point3(2.0, 0.0, -10.0);
-    const float focusDist = 7.0;
-    const float lensRadius = 0.1;
-
-    const auto camera = Camera(cameraPos, lookAt, focusDist, aspectRatio, pixelHeight, verticalFovDegrees, lensRadius);
+    // Case
+    const auto [camera, scene] = manualScene();
+    //const auto [camera, scene] = randomizedScene();
+    //const auto [camera, scene] = cornellBox();
 
     // Render
     const auto image = camera.render(scene);
